@@ -14,19 +14,28 @@ public:
 };
 
 
-void inserirItem(Node*& node, float x1, float x2) {
-    Node* nodeNovo = new Node(x1, x2);
-    nodeNovo->next = node;
-    node = nodeNovo;
+void imprimirLista(Node* node) {
+    if (node != NULL) {
+        cout << node->data[0] << ", " << node->data[1] << endl;
+        imprimirLista(node->next);
+    }
 }
 
-void imprimirLista(Node* node) {
-
-    Node* item = node;
-
-    while (item != NULL) {
-        cout << item->data[0] << ", " << item->data[1] << endl;
-        item = (*item).next;
+void inserirItem(Node*& node, float x1, float x2, bool insereNoFinal = false) {
+    Node* nodeNovo = new Node(x1, x2);
+    if (insereNoFinal) {
+        Node* item = node;
+        while (item != NULL && item->next != NULL) {
+            item = item->next;
+        }
+        if (item == NULL) {
+            node = nodeNovo;
+        } else {
+            item->next = nodeNovo;
+        }
+    } else {
+        nodeNovo->next = node;
+        node = nodeNovo;
     }
 }
 
@@ -76,7 +85,6 @@ int main (){
       inserirItem(head, x1, x2);
     }
   }
-
   file.close();
 
   cout << "Imprimir lista" << endl;
