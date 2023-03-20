@@ -24,6 +24,9 @@ public:
     void insertNode (Node * newNode);
     void printTree(Node * root);
     Node * treeSearch(int number);
+    void transplant(Node * u, Node * v);
+    Node * treeMinimum(Node * node);
+    void treeDelete(Node * node);
 };
 
 void BinaryTree::insertNode(Node * newNode) {
@@ -68,81 +71,76 @@ Node * BinaryTree::treeSearch(int number) {
   return temp;
 };
 
+void BinaryTree::transplant(Node * u, Node * v) {
+  if(u->p == NULL) {
+    root = v;
+  } else if(u == u->p->left) {
+    u->p->left = v;
+  } else {
+    u->p->right = v;
+  }
+
+  if(v != NULL) {
+    v->p = u->p; 
+  }
+};
+
+Node * BinaryTree::treeMinimum(Node * node) {
+  while(node->left != NULL) {
+    node = node->left;
+  }
+  return node;
+};
+
+void BinaryTree::treeDelete (Node * node) {
+  if(node->left == NULL) {
+    transplant(node, node->right);
+  } else if(node->right == NULL) {
+    transplant(node, node->left);
+  } else {
+    Node * y = treeMinimum(node->right);
+    if(y->p != node) {
+      transplant(y, y->right);
+      y->right = node->right;
+      y->right->p = y;
+    }
+    transplant(node, y);
+    y->left = node->left;
+    y->left->p = y;
+  }
+};
+
 
 int main () {
+
+  // Iniciando uma árvore binária
   BinaryTree T;
   Node * node1 = new Node(8);
   Node * node2 = new Node(6);
   Node * node3 = new Node(10);
 
+  // Adição de novos dados
   T.insertNode(node1);
   T.insertNode(node2);
   T.insertNode(node3);
 
-  cout << T.root->data << endl;
-  cout << T.root->left->data << endl;
-  cout << T.root->right->data << endl;
-
+  // Impressão de dados contidos na árvore
   T.printTree(T.root);
+  cout << endl;
 
-  // Node searchNode = T.treeSearch(6);
-  // if(searchNode != NULL) {
-  //   cout << "valor encontrado! " << searchNode.data << endl;
-  // }
+  // Busca de dado a partir de uma chave
+  Node * searchNode = T.treeSearch(7);
+  if(searchNode != NULL) {
+    cout << "Valor encontrado! Dado: " << searchNode->data << endl;
+  } else {
+    cout << "Valor não está presente na árvore binária" << endl;
+  }
 
-  // cout << T->root->left << endl;
-  // cout << T->root->right << endl;
+  // Eliminação de dado
+  T.treeDelete(node3);
 
-
+  // Nova árvore
+  T.printTree(T.root);
 
   return 0;
 }
-
-// void BinaryTree::addNode (int number) {
-//     Node * newNode = new Node(number);
-//     Node * node = root;
-//     if(root == NULL) {
-//       root = newNode;
-//     } else {
-//     //left
-//       if(number < root->data) {
-//         node = node->left;
-//         while(node != NULL) {
-//           if(number < node->data) {
-//             if(node->left == NULL) {
-//               node->left = newNode;
-//               node->left->p = node;
-//               return;
-//             }
-//             node = node->left;
-//           } else {
-//             if(node->right == NULL) {
-//               node->right = newNode;
-//               node->right->p = node;
-//               return;
-//             }
-//             node = node->right;
-//           }
-//         }
-//       } else {
-//         node = node->right;
-//         while(node != NULL) {
-//           if(number < node->data) {
-//             if(node->left == NULL) {
-//               node->left = newNode;
-//               node->left->p = node;
-//               return;
-//             }
-//             node = node->left;
-//           } else {
-//             if(node->right == NULL) {
-//               node->right = newNode;
-//               node->right->p = node;
-//               return;
-//             }
-//             node = node->right;
-//           }
-//         }
-//       }
-//   }
-// };
