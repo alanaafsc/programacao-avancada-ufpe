@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 class Node{
@@ -112,35 +114,77 @@ void BinaryTree::treeDelete (Node * node) {
 
 
 int main () {
+  string fileName = "data.txt";
+  ifstream file;
+  file.open(fileName);
 
   // Iniciando uma árvore binária
   BinaryTree T;
-  Node * node1 = new Node(8);
-  Node * node2 = new Node(6);
-  Node * node3 = new Node(10);
 
-  // Adição de novos dados
-  T.insertNode(node1);
-  T.insertNode(node2);
-  T.insertNode(node3);
-
-  // Impressão de dados contidos na árvore
-  T.printTree(T.root);
-  cout << endl;
-
-  // Busca de dado a partir de uma chave
-  Node * searchNode = T.treeSearch(7);
-  if(searchNode != NULL) {
-    cout << "Valor encontrado! Dado: " << searchNode->data << endl;
-  } else {
-    cout << "Valor não está presente na árvore binária" << endl;
+  string line;
+  int x1;
+  // Construir uma árvore de busca binária contendo todos os dados contidos no arquivo data.txt
+  if(file.is_open()) {
+    while(getline(file, line)) {
+      istringstream ss(line);
+      ss >> x1;
+      Node * node = new Node(x1);
+      T.insertNode(node);
+    }
   }
 
-  // Eliminação de dado
-  T.treeDelete(node3);
+  file.close();
 
   // Nova árvore
   T.printTree(T.root);
+  cout << endl;
+
+  // Procurar na árvore de busca binária os dados armazenados no arquivo search.txt
+  string lineSearch;
+  int x2;
+
+  string fileNameSearch = "search.txt";
+  ifstream fileSearch;
+  fileSearch.open(fileNameSearch);
+
+  if(fileSearch.is_open()) {
+    while(getline(fileSearch, lineSearch)) {
+      istringstream ss(lineSearch);
+      ss >> x2;
+      Node * searchNode = T.treeSearch(x2);
+      cout << "Valor a ser procurado: " << x2 << endl;
+      if(searchNode != NULL) {
+        cout << "Valor encontrado! Dado: " << searchNode->data << endl;
+      } else {
+        cout << "Valor não está presente na árvore binária" << endl;
+      }
+    }
+  }
+
+  fileSearch.close();
+
+  // Eliminar os dados armazenados no arquivo delete.txt.
+  string fileNameDelete = "delete.txt";
+  ifstream fileDelete;
+  fileDelete.open(fileNameDelete);
+
+  string lineDelete;
+  int x3;
+
+  if(fileDelete.is_open()) {
+    while(getline(fileDelete, lineDelete)) {
+      istringstream ss(lineDelete);
+      ss >> x3;
+      Node * node = T.treeSearch(x3);
+      cout << "Valor a ser deletado: " << x3 << endl;
+      T.treeDelete(node);
+    }
+  }
+
+  fileDelete.close();
+  // Nova árvore alterada
+  T.printTree(T.root);
+  cout << endl;
 
   return 0;
 }
