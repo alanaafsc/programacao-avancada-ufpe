@@ -27,6 +27,7 @@
         "iostream": "cpp",
         "__locale": "cpp",
         "__string": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "limits": "cpp"
     }
 }
