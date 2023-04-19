@@ -5,30 +5,23 @@
 #include <limits>
 using namespace std;
 
-struct GNode
-{
-  int color; // 0 white 1 grey 2 black
-  int distance;
-  int previous;
+// Codigo de Fila Lista:
+class QNode {
+public:
+  int data;
+  QNode* next;
+  QNode (int number) {
+    data = number;
+    next = NULL;
+  };
 };
-
-// FILA:
-// class QNode {
-// public:
-//   int data;
-//   QNode* next;
-//   QNode (int number) {
-//     data = number;
-//     next = NULL;
-//   };
-// };
 
 class Queue {
 public:
-    GNode *front, *rear;
+    QNode *front, *rear;
     Queue ();
-    void enQueue(GNode node);
-    GNode deQueue();
+    void enQueue(int number);
+    void deQueue();
     void printQueue();
 };
 
@@ -37,32 +30,31 @@ Queue::Queue () {
   rear = NULL;
 }
 
-void Queue::enQueue(GNode * node) {
-  // GNode *node = new GNode();
+void Queue::enQueue(int number) {
+  QNode *node = new QNode(number);
   if(rear == NULL) {
     rear = node;
     front = node;
   }
   else{
-  rear->previous = node;
+  rear->next = node;
   rear = node;
   }
-  // cout << "Enqueue " << node->distance << endl;
+  cout << "Enqueue " << number << endl;
   printQueue();
 };
 
-GNode Queue::deQueue () {
+void Queue::deQueue () {
   if(front != NULL) {
-    GNode * node = front;
-    cout << "Dequeue " << front->distance << endl;
-
-    front = front->previous;
+    QNode * node = front;
+    cout << "Dequeue " << front->data << endl;
+    front = front->next;
     delete node;
   }
 
-  // if(front == NULL) {
-  //   cout << "Empty queue" << endl;
-  // }
+  if(front == NULL) {
+    cout << "Empty queue" << endl;
+  }
 
   printQueue();
 };
@@ -85,12 +77,19 @@ void Queue::printQueue() {
 
 // Graph node
 
+struct GNode
+{
+  int color; // 0 white 1 grey 2 black
+  int distance;
+  int previous;
+};
+
 class graph
 {
 public:
-  int nbNodes;
-  int** table;
-  GNode* nodeList;
+  int nbNodes; // n de nodes
+  int** table; // importar graph em table
+  GNode* nodeList; 
 
   // Create graph from a file, with a given number of nodes
   graph(string, int);
@@ -133,29 +132,73 @@ graph::graph (string file, int nodes) {
 
 };
 
-
 void graph::bfs(int source) {
-  for(GNode node : nodeList) {
-    node->color = 0;
-    node->distance = numeric_limits<int>::max();
-    node->previous = NULL;
+
+  for(int i = 0; i < nbNodes; i++) {
+    nodeList[i].color = 0;
+    nodeList[i].distance = numeric_limits<int>::max();
+    nodeList[i].previous = -1;
   }
-  GNode * source = new GNode();
-  source->color = 1;
-  source->distance = 0;
-  source->previous = NULL;
+  nodeList[source].color = 1;
+  nodeList[source].distance = 0;
+  nodeList[source].previous = -1;
 
-  Queue * Q = new Queue();
-  enQueue(source);
+  Queue * Q = new Queue(); // Conjunto de vértices cinzentos
+  Q->enQueue(source); // Source entrará como data no QNode
 
-  while(Q != NULL) {
-    GNode u = deQueue();
+  while(Q->front != NULL) {
+    int u = Q->front->data;
+    Q->deQueue();
+
+    for(int i = 0; i < nbNodes; i++) {
+      if(table[u][i] != 0 && nodeList[i].color == 0) {
+        nodeList[i].color = 1;
+        nodeList[i].distance = nodeList[u].distance + 1;
+        nodeList[i].previous = u;
+        Q->enQueue(i);
+      }
+    }
+
+    nodeList[u].color = 2;
+  }
+};
+
+void graph::printPath(int source, int destination) {
+  // cria um vetor para armazenar o caminho percorrido durante a busca em largura
+  int * path = new int[nbNodes];
+
+  if (destination == source) {
+    cout << "Path from " << source << " to node " << destination << endl;
+    cout << source << " ";
+  } else if (nodeList[destination].previous == -1) {
+    cout << "No path found from " << source << " to node " << destination << endl;
+  } else {
+    int index = 0;
+    int current = destination;
+
+    // percorre o caminho percorrido a partir do nó de destino e armazena em um vetor
+    while (current != source) {
+      if (nodeList[current].previous != -1) {
+        path[index++] = current;
+      }
+      current = nodeList[current].previous;
+    }
+
+    path[index] = source;
+
+    // ordem inversa
+    cout << "Path from " << source << " to node " << destination << endl;
+    for (int i = index; i >= 0; i--) {
+      if (path[i] != -1) {
+        cout << path[i] << " ";
+      }
+    }
+    cout << endl;
   }
 
-}
-
-
-
+  // Libera memória:
+  delete[] path;
+};
 
 int main()
 {
@@ -166,7 +209,7 @@ int main()
   g.bfs(0);
 
   // Print path to from 0 to 4
-  // g.printPath(0,4);
+  g.printPath(0,4);
 
   return 0;
 }
