@@ -180,7 +180,6 @@ void graph::printPath(int source, int destination) {
         path[index++] = current;
       }
       current = nodeList[current].previous;
-      cout << "current: " << current << endl;
     }
 
     path[index] = source;
@@ -208,7 +207,7 @@ int main()
   g.bfs(0);
 
   // Print path to from 0 to 4
-  g.printPath(1,8);
+  g.printPath(0,4);
 
   return 0;
 }
