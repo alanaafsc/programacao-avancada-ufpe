@@ -32,13 +32,13 @@ Queue::Queue () {
 
 void Queue::enQueue(int number) {
   QNode *node = new QNode(number);
-  if(rear == NULL) {
+  if (front == NULL) {
     rear = node;
     front = node;
   }
-  else{
-  rear->next = node;
-  rear = node;
+  else {
+    rear->next = node;
+    rear = node;
   }
   cout << "Enqueue " << number << endl;
   printQueue();
@@ -89,7 +89,7 @@ class graph
 public:
   int nbNodes; // n de nodes
   int** table; // importar graph em table
-  GNode* nodeList; 
+  GNode* nodeList; // lista de nodes
 
   // Create graph from a file, with a given number of nodes
   graph(string, int);
@@ -149,7 +149,6 @@ void graph::bfs(int source) {
   while(Q->front != NULL) {
     int u = Q->front->data;
     Q->deQueue();
-
     for(int i = 0; i < nbNodes; i++) {
       if(table[u][i] != 0 && nodeList[i].color == 0) {
         nodeList[i].color = 1;
@@ -158,7 +157,6 @@ void graph::bfs(int source) {
         Q->enQueue(i);
       }
     }
-
     nodeList[u].color = 2;
   }
 };
@@ -182,6 +180,7 @@ void graph::printPath(int source, int destination) {
         path[index++] = current;
       }
       current = nodeList[current].previous;
+      cout << "current: " << current << endl;
     }
 
     path[index] = source;
@@ -209,7 +208,7 @@ int main()
   g.bfs(0);
 
   // Print path to from 0 to 4
-  g.printPath(0,4);
+  g.printPath(1,8);
 
   return 0;
 }
