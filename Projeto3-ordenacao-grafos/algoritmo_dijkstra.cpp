@@ -101,8 +101,8 @@ public:
   // Print the path from the source to a given node
   void printPath(int, int);
 
-  void relax(GNode u, GNode v);
-  int extractMin(Queue Q);
+  void relax(int i, int j);
+  int extractMin(Queue *Q);
 };
 
 graph::graph (string file, int nodes) {
@@ -137,21 +137,25 @@ graph::graph (string file, int nodes) {
 };
 
 void graph::relax(int i, int j) {
-  if(nodeList[j].distance > (nodeList[i].distance + table[i][j]) {
-    nodeList[j].distance = (nodeList[i].distance + table[i][j];
-    nodeList[j].previous = nodeList[i];
+  if(nodeList[j].distance > (nodeList[i].distance + table[i][j])) {
+    nodeList[j].distance = nodeList[i].distance + table[i][j];
+    nodeList[j].previous = i;
   }
 };
 
-int graph::extractMin(Queue Q) {
-  int * min = numeric_limits<int>::max();
-  for(int i = 0; i < nbNodes; i++) {
-    if(nodeList[i] == 1) {
-      if(nodeList[i].distance < nodeList[min].distance) {
-        min = i;
-      }
+int graph::extractMin(Queue *Q) {
+  int min = numeric_limits<int>::max();
+  int minIndex = -1;
+  QNode *current = Q->front;
+  while(current != NULL) {
+    int index = current->data;
+    if(nodeList[index].distance < min) {
+      min = nodeList[index].distance;
+      minIndex = index;
     }
+    current = current->next;
   }
+  return minIndex;
 }
 
 void graph::dijkstra(int source) {
@@ -173,9 +177,9 @@ void graph::dijkstra(int source) {
     Q->deQueue();
     for(int i = 0; i < nbNodes; i++) {
       if(table[u][i] != 0 && nodeList[i].color == 0) {
+        relax(u, i);
         nodeList[i].color = 1;
-        nodeList[i].distance = nodeList[u].distance + table[u][i];
-        nodeList[i].previous = u;
+        Q->enQueue(i);
       }
     }
     nodeList[u].color = 2;
@@ -183,51 +187,29 @@ void graph::dijkstra(int source) {
 };
 
 void graph::printPath(int source, int destination) {
-  // cria um vetor para armazenar o caminho percorrido durante a busca em largura
-  int * path = new int[nbNodes];
-
-  if (destination == source) {
-    cout << "Path from " << source << " to node " << destination << endl;
+  if(destination == source) {
     cout << source << " ";
-  } else if (nodeList[destination].previous == -1) {
-    cout << "No path found from " << source << " to node " << destination << endl;
-  } else {
-    int index = 0;
-    int current = destination;
-
-    // percorre o caminho percorrido a partir do nó de destino e armazena em um vetor
-    while (current != source) {
-      if (nodeList[current].previous != -1) {
-        path[index++] = current;
-      }
-      current = nodeList[current].previous;
-    }
-
-    path[index] = source;
-
-    // ordem inversa
-    cout << "Path from " << source << " to node " << destination << endl;
-    for (int i = index; i >= 0; i--) {
-      if (path[i] != -1) {
-        cout << path[i] << " ";
-      }
-    }
-    cout << endl;
   }
-
-  // Libera memória:
-  delete[] path;
+  else if(nodeList[destination].previous == -1) {
+    cout << "No path from " << source << " to " << destination << " exists" << endl;
+  }
+  else {
+    printPath(source, nodeList[destination].previous);
+    cout << destination << " ";
+  }
 };
+
 
 int main()
 {
   // Create a graph
   graph g("graph2.txt",5);
 
-  // Call Breadth-first search from node 0
-  g.bfs(0);
+  // Call Dijkstra algorithm from node 0
+  g.dijkstra(0);
 
   // Print path to from 0 to 2
+  cout << "Path from 0 to node 2" << endl;
   g.printPath(0,2);
 
   return 0;
